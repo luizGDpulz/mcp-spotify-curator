@@ -20,8 +20,22 @@
     "playlists",
     "curator"
   ],
-  "author": "",
-  "license": "GPL-3.0",
+  "author": "Luiz Gustavo Dias Pulz <luizgustavodiaspulzoficial@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luizGDpulz/mcp-spotify-curator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/luizGDpulz/mcp-spotify-curator/issues"
+  },
+  "homepage": "https://github.com/luizGDpulz/mcp-spotify-curator#readme",
+  "files": [
+    "dist",
+    "README.md",
+    "README.pt-BR.md",
+    "LICENSE"
+  ],
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
