@@ -234,7 +234,7 @@ pnpm run build
 * `pnpm run start`: Launch the MCP stdio server.
 * `pnpm run auth:setup`: Run the OAuth 2.0 authorization helper.
 * `pnpm run typecheck`: Static TypeScript validation.
-* `pnpm test`: Run automated unit and integration tests with Vitest.
+* `pnpm test`: Run automated unit and MCP integration tests with Node.js native test runner.
 
 ---
 

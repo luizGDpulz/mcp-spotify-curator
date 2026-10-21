@@ -149,7 +149,7 @@ export function cleanTrackUri(input: string): string {
   if (epMatch) {
     return `spotify:episode:${epMatch[1]}`;
   }
-  if (/^[a-zA-Z0-9]+$/.test(trimmed)) {
+  if (/^[a-zA-Z0-9_]+$/.test(trimmed)) {
     return `spotify:track:${trimmed}`;
   }
   return trimmed;

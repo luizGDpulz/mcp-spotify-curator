@@ -89,5 +89,7 @@ mcp-spotify-curator/
 │   ├── spotify.ts             # Cliente da API Spotify, backups, curadoria e retries
 │   └── auth-setup.ts          # Script para gerar o Refresh Token inicial
 └── test/
-    └── spotify.test.ts        # Suíte de testes unitários e de integração (Vitest)
+    ├── utils.test.ts          # Testes unitários de higienização e normalização
+    ├── spotify-client.test.ts # Testes do cliente Spotify (backups, retries, curadoria)
+    └── mcp-server.test.ts     # Testes de integração do servidor MCP via InMemoryTransport
 ```
