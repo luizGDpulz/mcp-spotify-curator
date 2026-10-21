@@ -18,6 +18,11 @@ const SCOPES = [
   "playlist-read-collaborative",
   "playlist-modify-public",
   "playlist-modify-private",
+  "user-library-read",
+  "user-top-read",
+  "user-read-recently-played",
+  "user-read-playback-state",
+  "user-read-currently-playing",
 ].join(" ");
 
 function openBrowser(url: string) {

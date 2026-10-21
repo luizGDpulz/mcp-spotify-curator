@@ -2,19 +2,53 @@
 
 > Servidor **MCP (Model Context Protocol)** em TypeScript para curadoria, criação e gerenciamento inteligente de playlists no Spotify diretamente pelo seu assistente de IA (**Antigravity**, Claude Desktop, Cursor, etc.).
 
-Opera localmente via transporte **`stdio`**, garantindo consumo mínimo de recursos (0% CPU ocioso, ~30–50MB RAM) e total privacidade.
+Opera localmente via transporte **`stdio`**, garantindo consumo mínimo de recursos (0% CPU ocioso, ~30–50MB RAM), backups automáticos locais antes de operações destrutivas, tratamento inteligente de Rate Limiting (HTTP 429) e total privacidade.
 
 ---
 
-## 🚀 Ferramentas MCP Disponíveis
+## 🚀 Ferramentas MCP Disponíveis (Tools)
 
+### 📂 Gerenciamento & Operações Atômicas de Playlists
 | Ferramenta | Parâmetros | Descrição |
 | :--- | :--- | :--- |
 | `list_user_playlists` | `{ limit?: number }` | Lista as playlists da conta do usuário para descobrir IDs e detalhes. |
-| `get_playlist_tracks` | `{ playlist_id: string }` | Retorna todas as faixas da playlist com URIs, títulos, artistas e álbuns higienizados. |
-| `search_spotify_tracks` | `{ queries: string[] }` | Pesquisa no catálogo musical por termos (ex: `["Bohemian Rhapsody - Queen"]`) e devolve os URIs correspondentes. |
-| `create_playlist` | `{ name: string, description?: string }` | Cria uma nova playlist no perfil do usuário e devolve seu ID e link direto. |
-| `update_playlist_tracks` | `{ playlist_id: string, uris: string[] }` | Substitui todas as faixas da playlist pela nova lista ordenada de URIs (reordenação ou reset). Suporta listas grandes dividindo automaticamente em lotes. |
+| `get_playlist_tracks` | `{ playlist_id: string }` | Retorna todas as faixas da playlist com URIs, títulos, artistas, álbuns, duração e datas higienizadas. |
+| `search_spotify_tracks` | `{ queries: string[] }` | Pesquisa no catálogo musical por termos (ex: `["Bohemian Rhapsody - Queen"]` ou filtros `artist:`, `year:`, `genre:`) e devolve os URIs. |
+| `create_playlist` | `{ name: string, description?: string, public?: boolean }` | Cria uma nova playlist no perfil do usuário e devolve seu ID e link direto. |
+| `add_tracks_to_playlist` | `{ playlist_id: string, uris: string[], position?: number }` | Adiciona novas faixas atomicamente (no final ou em posição específica) sem sobrescrever a playlist. |
+| `remove_tracks_from_playlist` | `{ playlist_id: string, uris: string[] }` | Remove faixas específicas atomicamente com geração automática de backup prévio. |
+| `update_playlist_tracks` | `{ playlist_id: string, uris: string[] }` | Substitui todas as faixas da playlist pela nova lista ordenada de URIs (com backup automático e divisão em lotes). |
+
+### 🪄 Curadoria Inteligente, Higienização & Backups Locais
+| Ferramenta | Parâmetros | Descrição |
+| :--- | :--- | :--- |
+| `deduplicate_playlist` | `{ playlist_id: string, dry_run?: boolean, match_by?: "uri" \| "title_artist" }` | Identifica e remove duplicatas exatas ou versões repetidas/remasterizadas da mesma música com backup automático. |
+| `sort_playlist_by` | `{ playlist_id: string, criteria: "name" \| "artist" \| "album" \| "duration" \| "release_date" \| "added_at", order?: "asc" \| "desc" }` | Ordena automaticamente todas as faixas da playlist pelo critério escolhido. |
+| `list_playlist_backups` | `{ playlist_id?: string }` | Lista snapshots de backup salvos automaticamente em `~/.cache/mcp-spotify-curator/backups`. |
+| `restore_playlist_backup` | `{ playlist_id: string, backup_id?: string }` | Restaura uma playlist para um estado anterior a partir de um backup local. |
+
+### 🎧 Contexto Musical Pessoal do Usuário
+| Ferramenta | Parâmetros | Descrição |
+| :--- | :--- | :--- |
+| `get_user_saved_tracks` | `{ limit?: number, offset?: number }` | Obtém as músicas curtidas (*Liked Songs*) da biblioteca do usuário. |
+| `get_user_top_items` | `{ type: "artists" \| "tracks", time_range?: "short_term" \| "medium_term" \| "long_term", limit?: number }` | Retorna os artistas ou faixas mais ouvidos pelo usuário em curto (~4 semanas), médio (~6 meses) ou longo prazo. |
+| `get_recently_played` | `{ limit?: number }` | Retorna o histórico das últimas faixas reproduzidas pelo usuário. |
+| `get_current_playback` | `{}` | Obtém informações sobre a faixa que está tocando neste exato momento no player do Spotify. |
+
+---
+
+## 🧩 MCP Resources & Prompts
+
+### Resources Expostos
+* `spotify://me/playlists`: Lista resumida das playlists do usuário autenticado.
+* `spotify://me/top-artists`: Artistas mais ouvidos pelo usuário.
+* `spotify://me/top-tracks`: Músicas mais ouvidas pelo usuário.
+* `spotify://playlists/{playlist_id}`: Faixas detalhadas de uma playlist específica.
+
+### Prompts Pré-definidos
+* `curate-genre-playlist`: Cria uma playlist temática alinhada ao gosto musical do usuário.
+* `smooth-transition-sorter`: Analisa e reorganiza uma playlist existente em uma progressão fluida de energia.
+* `clean-and-deduplicate`: Audita e limpa músicas duplicadas ou versões remasterizadas repetidas com backup seguro.
 
 ---
 
@@ -80,10 +114,10 @@ pnpm run auth:setup
 ```
 
 1. O script iniciará um servidor local temporário na porta `8888` e tentará abrir o navegador automaticamente.
-2. Faça login e clique em **Agree / Autorizar** para conceder permissões de leitura e escrita de playlists.
+2. Faça login e clique em **Agree / Autorizar** para conceder permissões de leitura/escrita de playlists e leitura de biblioteca/top itens.
 3. Ao concluir, o navegador exibirá uma tela de confirmação e o script gravará o `SPOTIFY_REFRESH_TOKEN` diretamente no seu arquivo `.env`!
 
-> 💡 **Como funciona a renovação?** O servidor MCP renova o token de acesso silenciosamente na memória sempre que ele expira (a cada 1 hora). Você não precisará rodar o setup novamente.
+> 💡 **Como funciona a renovação?** O servidor MCP renova o token de acesso silenciosamente na memória sempre que ele expira (a cada 1 hora). Você só precisará rodar o setup novamente se quiser autorizar novos escopos.
 
 ### 4. Compilar o Projeto
 
@@ -142,10 +176,11 @@ Adicione o servidor na sua configuração do Antigravity:
 Com o servidor MCP configurado, converse naturalmente com seu assistente:
 
 * *"Quais são as playlists que tenho no meu Spotify?"*
-* *"Crie uma nova playlist chamada 'Cyberpunk Focus' com descrição 'Trilha sonora para programar'."*
-* *"Busque as músicas 'Resonance - HOME', 'Subdivisions - Rush' e 'Midnight City - M83' e coloque na minha playlist 'Cyberpunk Focus'."*
-* *"Veja as músicas da minha playlist 'Treino', analise a energia delas e reorganize para que as faixas mais intensas fiquem no meio do treino."*
-* *"Elimine as músicas duplicadas da minha playlist 'Favoritas'."*
+* *"Adicione as músicas 'Resonance - HOME' e 'Midnight City - M83' no topo da minha playlist 'P-Vibes'."*
+* *"Analise meus artistas mais ouvidos dos últimos 6 meses e crie uma playlist inédita inspirada neles."*
+* *"Verifique se há músicas duplicadas ou versões remasterizadas repetidas na minha playlist 'Old School Moda' e limpe."*
+* *"Ordene minha playlist 'classics' por data de lançamento (das mais antigas para as mais novas)."*
+* *"Desfaça a última alteração na minha playlist restaurando o backup mais recente."*
 
 ---
 
@@ -169,6 +204,7 @@ docker run -i --rm --env-file .env mcp-spotify-curator
 * `pnpm run start`: Inicia o servidor MCP stdio a partir de `dist/index.js`.
 * `pnpm run auth:setup`: Inicia o assistente de autorização OAuth 2.0.
 * `pnpm run typecheck`: Valida a integridade dos tipos TypeScript sem emitir arquivos.
+* `pnpm test`: Executa a suíte de testes automatizados com Vitest.
 
 ---
 
