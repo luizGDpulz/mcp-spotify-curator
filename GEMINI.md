@@ -71,12 +71,17 @@ Como o servidor MCP roda silenciosamente em segundo plano chamado pelo cliente d
 
 ```text
 mcp-spotify-curator/
-├── .github/workflows/ci.yml   # Pipeline de CI (typecheck, test, build)
-├── AGENTS.md                  # Contexto e especificações para o agente
-├── GEMINI.md                  # Contexto espelhado para Gemini/Antigravity
-├── .gitignore                 # node_modules, dist, .env
+├── .github/
+│   ├── workflows/ci.yml       # Pipeline de CI (typecheck, test, build)
+│   ├── ISSUE_TEMPLATE/        # Templates de issues
+│   └── pull_request_template.md
+├── GEMINI.md                  # Contexto e especificações para Antigravity/Gemini
+├── CONTRIBUTING.md            # Guia de contribuição
+├── LICENSE                    # Licença MIT
+├── README.md                  # Documentação principal (Inglês)
+├── README.pt-BR.md            # Documentação em Português
+├── .gitignore                 # node_modules, dist, .env, AGENTS.md
 ├── .env.example               # Template de variáveis de ambiente
-├── README.md                  # Documentação pública para GitHub
 ├── package.json               # Dependências e scripts de build/start/test
 ├── tsconfig.json              # Configuração TypeScript (ESM)
 ├── src/
